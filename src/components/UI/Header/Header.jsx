@@ -15,6 +15,7 @@ const Header = ({categories, selectedCat, onChangeCat}) => {
       spaceBetween={16}
       slidesPerView={1.1}
       centeredSlides={true}
+      loop={true}
       onSlideChange={(swiper) => {
         const index = swiper.realIndex
         const cat = categories[index]
