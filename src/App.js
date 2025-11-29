@@ -15,7 +15,11 @@ function App() {
   const categories = [
     {id:'subs', label:'Subscriptions'},
     {id:'currency', label:'In-game currency'},
-    {id:'vpn', label: 'VPN'}
+    {id:'vpn', label: 'VPN'},
+
+    {id:'subs', label:'Subscriptions'},
+    {id:'currency', label:'In-game currency'},
+    {id:'vpn', label: 'VPN'},
     ]
 
   //Кастомные Хуки
