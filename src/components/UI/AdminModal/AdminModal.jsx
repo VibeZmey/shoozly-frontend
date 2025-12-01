@@ -1,11 +1,17 @@
+// src/components/UI/AdminModal/AdminModal.jsx
 import React, { useState, useEffect } from "react";
 import styles from './Admin.module.css'
 
 const emptyProduct = {
   id: null,
-  title: "",
+  name: "",
   price: "",
-  cat: "",
+  categoryId: "",
+  imageFile: null,
+};
+
+const emptyCategory = {
+  name: "",
 };
 
 const AdminModal = ({
@@ -18,22 +24,24 @@ const AdminModal = ({
   onCreateProduct,
   onUpdateProduct,
   onDeleteProduct,
+  onCreateCategory,
   onDeleteCategory,
 }) => {
   const [formProduct, setFormProduct] = useState(emptyProduct);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [formCategory, setFormCategory] = useState(emptyCategory);
 
-  // При открытии модалки сбрасываем форму
   useEffect(() => {
     if (visible) {
       setFormProduct(emptyProduct);
       setIsEditMode(false);
+      setFormCategory(emptyCategory);
     }
   }, [visible]);
 
   if (!visible) return null;
 
-  const handleChange = (e) => {
+  const handleProductChange = (e) => {
     const { name, value } = e.target;
     setFormProduct((prev) => ({
       ...prev,
@@ -41,27 +49,40 @@ const AdminModal = ({
     }));
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0] || null;
+    setFormProduct((prev) => ({
+      ...prev,
+      imageFile: file,
+    }));
+  };
+
   const handleEditClick = (product) => {
     setFormProduct({
       id: product.id,
-      title: product.title,
+      name: product.name,
       price: product.price,
-      cat: product.cat,
+      categoryId: product.categoryId,
+      imageFile: null, // картинку редактируем при необходимости
     });
     setIsEditMode(true);
   };
 
-  const handleSubmit = async (e) => {
+  const handleProductSubmit = async (e) => {
     e.preventDefault();
 
     const payload = {
-      title: formProduct.title,
+      id: formProduct.id,
+      name: formProduct.name.trim(),
       price: Number(formProduct.price),
-      cat: formProduct.cat,
+      categoryId: formProduct.categoryId,
+      image: formProduct.imageFile || undefined,
     };
 
-    if (isEditMode && formProduct.id != null) {
-      await onUpdateProduct(formProduct.id, payload);
+    if (!payload.name || !payload.price || !payload.categoryId) return;
+
+    if (isEditMode && payload.id) {
+      await onUpdateProduct(payload);
     } else {
       await onCreateProduct(payload);
     }
@@ -70,11 +91,24 @@ const AdminModal = ({
     setIsEditMode(false);
   };
 
-  const handleDeleteProduct = async (id) => {
+  const handleProductDelete = async (id) => {
     await onDeleteProduct(id);
+    if (isEditMode && formProduct.id === id) {
+      setFormProduct(emptyProduct);
+      setIsEditMode(false);
+    }
   };
 
-  const handleDeleteCategoryClick = async (id) => {
+  const handleCategorySubmit = async (e) => {
+    e.preventDefault();
+    const name = formCategory.name.trim();
+    if (!name) return;
+
+    await onCreateCategory({ name });
+    setFormCategory(emptyCategory);
+  };
+
+  const handleCategoryDelete = async (id) => {
     await onDeleteCategory(id);
   };
 
@@ -85,85 +119,116 @@ const AdminModal = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div className={styles.header}>
-          <h2>Admin panel</h2>
+          <h2>Управление магазином</h2>
           <button className={styles.closeBtn} onClick={onClose}>
             ×
           </button>
         </div>
 
-        {loading && <div className={styles.info}>Loading...</div>}
+        {loading && <div className={styles.info}>Загрузка…</div>}
         {error && <div className={styles.error}>{error}</div>}
 
         <div className={styles.content}>
-          {/* Лист товаров */}
+          {/* Товары */}
           <div className={styles.products}>
-            <h3>Products</h3>
+            <h3>Товары</h3>
             <ul className={styles.productList}>
               {products?.map((p) => (
                 <li key={p.id} className={styles.productItem}>
-                  <div>
-                    <span>{p.title}</span>
-                    <span className={styles.muted}>
-                      {p.price} · cat: {p.cat}
-                    </span>
+                  <div className={styles.productMain}>
+                    <div className={styles.productText}>
+                      <span className={styles.productName}>{p.name}</span>
+                      <span className={styles.productMeta}>
+                        {p.price} ₽ · cat: {p.categoryId}
+                      </span>
+                    </div>
+                    {p.imageUrl && (
+                      <img
+                        src={p.imageUrl}
+                        alt={p.name}
+                        className={styles.productImage}
+                      />
+                    )}
                   </div>
                   <div className={styles.productActions}>
-                    <button
-                      onClick={() => handleEditClick(p)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteProduct(p.id)}
-                    >
-                      Delete
+                    <button onClick={() => handleEditClick(p)}>Редакт.</button>
+                    <button onClick={() => handleProductDelete(p.id)}>
+                      Удалить
                     </button>
                   </div>
                 </li>
               ))}
+              {(!products || products.length === 0) && (
+                <li className={styles.emptyText}>Товаров пока нет</li>
+              )}
             </ul>
           </div>
 
-          {/* Форма продукта */}
+          {/* Форма товара */}
           <div className={styles.form}>
-            <h3>{isEditMode ? "Edit product" : "Create product"}</h3>
-            <form onSubmit={handleSubmit} className={styles.formBody}>
+            <h3>{isEditMode ? "Редактировать товар" : "Создать товар"}</h3>
+            <form
+              onSubmit={handleProductSubmit}
+              className={styles.formBody}
+            >
               <label>
-                Title
+                Название
                 <input
                   type="text"
-                  name="title"
-                  value={formProduct.title}
-                  onChange={handleChange}
+                  name="name"
+                  value={formProduct.name}
+                  onChange={handleProductChange}
+                  placeholder="Например, Netflix 1 мес."
                   required
                 />
               </label>
 
               <label>
-                Price
+                Цена
                 <input
                   type="number"
                   name="price"
                   value={formProduct.price}
-                  onChange={handleChange}
+                  onChange={handleProductChange}
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
                   required
                 />
               </label>
 
               <label>
-                Category
-                <input
-                  type="text"
-                  name="cat"
-                  value={formProduct.cat}
-                  onChange={handleChange}
+                Категория
+                <select
+                  name="categoryId"
+                  value={formProduct.categoryId}
+                  onChange={handleProductChange}
                   required
-                />
-                {/* позже можно заменить на select по categories */}
+                >
+                  <option value="">Выберите категорию</option>
+                  {categories?.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
               </label>
 
-              <button type="submit">
-                {isEditMode ? "Save" : "Create"}
+              <label>
+                Изображение
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                />
+                <span className={styles.hint}>
+                  Если не выбирать файл при редактировании, останется старая
+                  картинка.
+                </span>
+              </label>
+
+              <button type="submit" className={styles.submitBtn}>
+                {isEditMode ? "Сохранить" : "Создать"}
               </button>
             </form>
           </div>
@@ -171,20 +236,41 @@ const AdminModal = ({
 
         {/* Категории */}
         <div className={styles.categories}>
-          <h3>Categories</h3>
+          <div className={styles.categoriesHeader}>
+            <h3>Категории</h3>
+          </div>
+
           <ul className={styles.categoryList}>
             {categories?.map((c) => (
               <li key={c.id} className={styles.categoryItem}>
-                <span>{c.name || c.title || c.cat}</span>
-                <button
-                  onClick={() => handleDeleteCategoryClick(c.id)}
-                >
-                  Delete
+                <span>{c.name}</span>
+                <button onClick={() => handleCategoryDelete(c.id)}>
+                  Удалить
                 </button>
               </li>
             ))}
+            {(!categories || categories.length === 0) && (
+              <li className={styles.emptyText}>
+                Категорий пока нет, создайте первую.
+              </li>
+            )}
           </ul>
-          {/* Редактирование/создание категорий можно будет добавить отдельно */}
+
+          <form
+            onSubmit={handleCategorySubmit}
+            className={styles.categoryForm}
+          >
+            <input
+              type="text"
+              value={formCategory.name}
+              onChange={(e) =>
+                setFormCategory({ name: e.target.value })
+              }
+              placeholder="Новая категория"
+              required
+            />
+            <button type="submit">Добавить</button>
+          </form>
         </div>
       </div>
     </div>

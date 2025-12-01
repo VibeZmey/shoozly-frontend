@@ -1,6 +1,6 @@
+// src/hooks/useApi.js
 import { useState, useCallback } from "react";
-
-const API_URL = "https://example.com/api"; // TODO: поменяй на свой бэкенд
+import ApiService from '../../API/ApiService'
 
 export function useApi() {
   const [products, setProducts] = useState([]);
@@ -8,55 +8,41 @@ export function useApi() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // ====== PRODUCTS ======
-
   const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-
-      const res = await fetch(`${API_URL}/products`);
-      if (!res.ok) {
-        throw new Error(`Failed to fetch products: ${res.status}`);
-      }
-
-      const data = await res.json();
+      const data = await ApiService.getProducts();
       setProducts(data);
-    } catch (err) {
-      console.error(err);
-      setError(err.message || "Failed to fetch products");
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchCategories = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await ApiService.getCategories();
+      setCategories(data);
+    } catch (e) {
+      setError(e.message);
     } finally {
       setLoading(false);
     }
   }, []);
 
   const createProduct = useCallback(
-    async (productData) => {
+    async (payload) => {
       try {
         setLoading(true);
         setError(null);
-
-        const res = await fetch(`${API_URL}/products`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(productData),
-        });
-
-        if (!res.ok) {
-          throw new Error(`Failed to create product: ${res.status}`);
-        }
-
-        // Вариант 1: заново тянуть все товары
+        await ApiService.createProduct(payload);
         await fetchProducts();
-
-        // Вариант 2 (альтернатива): взять ответ и добавить в стейт
-        // const newProduct = await res.json();
-        // setProducts((prev) => [...prev, newProduct]);
-      } catch (err) {
-        console.error(err);
-        setError(err.message || "Failed to create product");
+      } catch (e) {
+        setError(e.message);
       } finally {
         setLoading(false);
       }
@@ -65,27 +51,14 @@ export function useApi() {
   );
 
   const updateProduct = useCallback(
-    async (id, productData) => {
+    async (payload) => {
       try {
         setLoading(true);
         setError(null);
-
-        const res = await fetch(`${API_URL}/products/${id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(productData),
-        });
-
-        if (!res.ok) {
-          throw new Error(`Failed to update product: ${res.status}`);
-        }
-
+        await ApiService.updateProduct(payload);
         await fetchProducts();
-      } catch (err) {
-        console.error(err);
-        setError(err.message || "Failed to update product");
+      } catch (e) {
+        setError(e.message);
       } finally {
         setLoading(false);
       }
@@ -98,19 +71,10 @@ export function useApi() {
       try {
         setLoading(true);
         setError(null);
-
-        const res = await fetch(`${API_URL}/products/${id}`, {
-          method: "DELETE",
-        });
-
-        if (!res.ok) {
-          throw new Error(`Failed to delete product: ${res.status}`);
-        }
-
+        await ApiService.deleteProduct(id);
         await fetchProducts();
-      } catch (err) {
-        console.error(err);
-        setError(err.message || "Failed to delete product");
+      } catch (e) {
+        setError(e.message);
       } finally {
         setLoading(false);
       }
@@ -118,46 +82,31 @@ export function useApi() {
     [fetchProducts]
   );
 
-  // ====== CATEGORIES ======
-
-  const fetchCategories = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const res = await fetch(`${API_URL}/categories`);
-      if (!res.ok) {
-        throw new Error(`Failed to fetch categories: ${res.status}`);
+  const createCategory = useCallback(
+    async (payload) => {
+      try {
+        setLoading(true);
+        setError(null);
+        await ApiService.createCategory(payload);
+        await fetchCategories();
+      } catch (e) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
       }
-
-      const data = await res.json();
-      setCategories(data);
-    } catch (err) {
-      console.error(err);
-      setError(err.message || "Failed to fetch categories");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    [fetchCategories]
+  );
 
   const deleteCategory = useCallback(
     async (id) => {
       try {
         setLoading(true);
         setError(null);
-
-        const res = await fetch(`${API_URL}/categories/${id}`, {
-          method: "DELETE",
-        });
-
-        if (!res.ok) {
-          throw new Error(`Failed to delete category: ${res.status}`);
-        }
-
+        await ApiService.deleteCategory(id);
         await fetchCategories();
-      } catch (err) {
-        console.error(err);
-        setError(err.message || "Failed to delete category");
+      } catch (e) {
+        setError(e.message);
       } finally {
         setLoading(false);
       }
@@ -175,6 +124,7 @@ export function useApi() {
     createProduct,
     updateProduct,
     deleteProduct,
+    createCategory,
     deleteCategory,
   };
 }

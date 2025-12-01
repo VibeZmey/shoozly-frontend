@@ -29,7 +29,7 @@ const Header = ({categories, selectedCat, onChangeCat}) => {
               <button
               type='button'
               className={`${styles.cat__btn} ${selectedCat === cat.id ? styles.cat__btn_active : ''}`}>
-                {cat.label}
+                {cat.name}
               </button>
               </SwiperSlide>
           ))}

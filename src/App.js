@@ -13,17 +13,9 @@ import AdminModal from './components/UI/AdminModal/AdminModal.jsx'
 
 
 function App() {
-  //constants
-  // const categories = [
-  //   {id:'subs', label:'Subscriptions'},
-  //   {id:'currency', label:'In-game currency'},
-  //   {id:'vpn', label: 'VPN'},
+  //Кастомные Хуки
+  const {tg} = useTelegram();
 
-  //   {id:'subs', label:'Subscriptions'},
-  //   {id:'currency', label:'In-game currency'},
-  //   {id:'vpn', label: 'VPN'},
-  //   ]
-  
   const {
   products,
   categories,
@@ -37,25 +29,11 @@ function App() {
   deleteCategory,
   } = useApi();
 
-  //Кастомные Хуки
-  const {tg} = useTelegram();
-
-  //UseState only
-  const [cards, setCards] = useState([
-    {id: 1, title: 'test213123124', price: 1234, cat: 'subs'},
-    {id: 2, title: 'test1', price: 11, cat: 'vpn'},
-    {id: 3, title: 'test2', price: 134, cat: 'currency'},
-    {id: 4, title: 'test3', price: 1434, cat: 'subs'},
-    {id: 5, title: 'test4', price: 14, cat: 'vpn'},
-    {id: 6, title: 'test', price: 1234, cat: 'vpn'},
-    {id: 7, title: 'test', price: 1234, cat: 'currency'},
-  ])
-
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const [cartItems, setCartItems] = useState([])
 
-  const [selectedCat, setSelectedCat] = useState('Subscriptions')
+  const [selectedCat, setSelectedCat] = useState(null)
 
   const [isAdminOpen, setIsAdminOpen] = useState(false);
 
@@ -114,7 +92,7 @@ function App() {
 
   const totalQty = cartItems.reduce((sum, item) => {return sum + item.qty}, 0)
 
-  const filteredCards = cards.filter(card => card.cat === selectedCat)
+  const filteredProducts = products.filter(card => card.categoryId === selectedCat)
 
   
 
@@ -138,21 +116,23 @@ function App() {
       categories= {categories}/>
 
       <div className='showcase'>
-        {products && products.map(item => (
-        <ProductCard key={item.id} item={item} />
+        {filteredProducts && filteredProducts.map(item => (
+        <ProductCard key={item.id} item={item} onAddToCart={addToCart}/>
         ))}
       </div>
-      <pre>{JSON.stringify(products, null, 2)}</pre>
+      
 
 
 
-      <div className="bottom-controls"/>
+      <div className="bottom-controls">
           <button
             className="admin-toggle-btn"
             onClick={() => setIsAdminOpen(true)}
           >
             +
           </button>
+      </div>
+
 
       <CartDrawerButton 
       onClick={() => setIsDrawerOpen(!isDrawerOpen)} 
