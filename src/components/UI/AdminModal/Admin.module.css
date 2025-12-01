@@ -1,0 +1,301 @@
+/* AdminModal.module.css */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1500;
+}
+
+/* Основное окно модалки */
+.modal {
+  width: 95%;
+  max-width: 900px;
+  max-height: 90vh;
+  background: #141923;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  padding: 16px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  color: #ffffff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+/* Верхняя панель модалки */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.closeBtn {
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: 999px;
+  transition: background 0.15s ease;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Информационные сообщения */
+.info {
+  font-size: 13px;
+  color: #9fa6b2;
+  margin-bottom: 8px;
+}
+
+.error {
+  font-size: 13px;
+  color: #ff6b6b;
+  margin-bottom: 8px;
+}
+
+/* Основной контент: список товаров + форма */
+.content {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 16px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+/* Блок с товарами */
+.products {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.products h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.productList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  max-height: 260px;
+}
+
+.productItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-radius: 8px;
+  transition: background 0.12s ease;
+}
+
+.productItem + .productItem {
+  margin-top: 4px;
+}
+
+.productItem:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.productItem > div:first-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.productItem span {
+  font-size: 14px;
+}
+
+.muted {
+  font-size: 12px;
+  color: #9fa6b2;
+}
+
+/* Кнопки действий по товару */
+.productActions {
+  display: flex;
+  gap: 6px;
+}
+
+.productActions button {
+  border: none;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  transition: background 0.12s ease, transform 0.06s ease;
+}
+
+.productActions button:hover {
+  background: rgba(72, 134, 255, 0.9);
+}
+
+.productActions button:last-child {
+  background: rgba(255, 84, 84, 0.85);
+}
+
+.productActions button:last-child:hover {
+  background: rgba(255, 66, 66, 0.95);
+}
+
+/* Блок формы продукта */
+.form {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.formBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formBody label {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  gap: 4px;
+  color: #cfd4de;
+}
+
+.formBody input {
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 18, 26, 0.9);
+  color: #ffffff;
+  padding: 6px 8px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+
+.formBody input:focus {
+  border-color: rgba(72, 134, 255, 0.9);
+  background: rgba(15, 18, 26, 1);
+}
+
+.formBody button[type="submit"] {
+  margin-top: 6px;
+  border: none;
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  background: #4886ff;
+  color: #ffffff;
+  font-weight: 500;
+  align-self: flex-start;
+  transition: background 0.12s ease, transform 0.06s ease;
+}
+
+.formBody button[type="submit"]:hover {
+  background: #3a71dd;
+  transform: translateY(-1px);
+}
+
+/* Блок с категориями снизу */
+.categories {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.categories h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.categoryList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.categoryItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px;
+  border-radius: 8px;
+  transition: background 0.12s ease;
+  font-size: 13px;
+}
+
+.categoryItem + .categoryItem {
+  margin-top: 4px;
+}
+
+.categoryItem:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.categoryItem button {
+  border: none;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  background: rgba(255, 84, 84, 0.85);
+  color: #ffffff;
+  transition: background 0.12s ease;
+}
+
+.categoryItem button:hover {
+  background: rgba(255, 66, 66, 0.95);
+}
+
+/* Адаптив для мобильных */
+@media (max-width: 768px) {
+  .modal {
+    padding: 12px 12px 14px;
+  }
+
+  .content {
+    grid-template-columns: 1fr;
+    max-height: 50vh;
+  }
+
+  .productList {
+    max-height: 180px;
+  }
+
+  .categories {
+    margin-top: 6px;
+  }
+}

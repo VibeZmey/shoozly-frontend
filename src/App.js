@@ -7,20 +7,35 @@ import Header from './components/UI/Header/Header';
 import ProductCard from './components/UI/ProductCard/ProductCard';
 import CartDrawerButton from './components/UI/CartDrawerButton/CartDrawerButton';
 import CartDrawerModuleWindow from './components/UI/CartDrawerModuleWindow/CartDrawerModuleWindow';
+import { useApi } from './components/hooks/useApi.js'
+import AdminModal from './components/UI/AdminModal/AdminModal.jsx'
 
 
 
 function App() {
   //constants
-  const categories = [
-    {id:'subs', label:'Subscriptions'},
-    {id:'currency', label:'In-game currency'},
-    {id:'vpn', label: 'VPN'},
+  // const categories = [
+  //   {id:'subs', label:'Subscriptions'},
+  //   {id:'currency', label:'In-game currency'},
+  //   {id:'vpn', label: 'VPN'},
 
-    {id:'subs', label:'Subscriptions'},
-    {id:'currency', label:'In-game currency'},
-    {id:'vpn', label: 'VPN'},
-    ]
+  //   {id:'subs', label:'Subscriptions'},
+  //   {id:'currency', label:'In-game currency'},
+  //   {id:'vpn', label: 'VPN'},
+  //   ]
+  
+  const {
+  products,
+  categories,
+  loading,
+  error,
+  fetchProducts,
+  fetchCategories,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  deleteCategory,
+  } = useApi();
 
   //Кастомные Хуки
   const {tg} = useTelegram();
@@ -34,8 +49,6 @@ function App() {
     {id: 5, title: 'test4', price: 14, cat: 'vpn'},
     {id: 6, title: 'test', price: 1234, cat: 'vpn'},
     {id: 7, title: 'test', price: 1234, cat: 'currency'},
-
-
   ])
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -44,10 +57,15 @@ function App() {
 
   const [selectedCat, setSelectedCat] = useState('Subscriptions')
 
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
+
   //Остальные хуки
   useEffect(() => {
-    tg.ready()
-  },[])
+  fetchProducts();
+  fetchCategories();
+  tg.ready();
+  }, [tg, fetchProducts, fetchCategories]);
+
 
 
 
@@ -120,19 +138,39 @@ function App() {
       categories= {categories}/>
 
       <div className='showcase'>
-        {cards && 
-        (filteredCards.map(item => 
-          (<ProductCard 
-        key={item.id} 
-        item={item} 
-        onAddToCart={addToCart}/>)))}
+        {products && products.map(item => (
+        <ProductCard key={item.id} item={item} />
+        ))}
       </div>
+      <pre>{JSON.stringify(products, null, 2)}</pre>
+
+
+
+      <div className="bottom-controls"/>
+          <button
+            className="admin-toggle-btn"
+            onClick={() => setIsAdminOpen(true)}
+          >
+            +
+          </button>
 
       <CartDrawerButton 
       onClick={() => setIsDrawerOpen(!isDrawerOpen)} 
       isOpen={isDrawerOpen} 
       totalQty = {totalQty} 
       totalCost={totalCost}/>
+
+      {isAdminOpen && <AdminModal
+        visible={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
+        products={products}
+        categories={categories}
+        loading={loading}
+        error={error}
+        onCreateProduct={createProduct}
+        onUpdateProduct={updateProduct}
+        onDeleteProduct={deleteProduct}
+        onDeleteCategory={deleteCategory}/>}
 
     </div>
   );
