@@ -1,5 +1,5 @@
 // src/api/ApiService.js
-const API_BASE = "https://example.com"; // Поменяй на свой домен/localhost
+const API_BASE = ""; // Поменяй на свой домен/localhost
 
 export default class ApiService {
   // ====== PRODUCTS ======
@@ -12,35 +12,36 @@ export default class ApiService {
     return res.json(); // -> массив продуктов
   }
 
-  static async createProduct({ name, price, categoryId, image }) {
+  static async createProduct(payload) {
     const formData = new FormData();
-    formData.append("Name", name);
-    formData.append("Price", String(price));
-    formData.append("CategoryId", categoryId);
-    if (image) {
-      formData.append("Image", image);
+    formData.append("Name", payload.Name);
+    formData.append("CategoryId", payload.CategoryId);
+    formData.append("Price", payload.Price);
+    if (payload.Image) {
+      formData.append("Image", payload.Image); // File объект напрямую
     }
 
     const res = await fetch(`${API_BASE}/api/Product`, {
       method: "POST",
-      body: formData, // ВАЖНО: не ставим Content-Type вручную
+      body: formData,
     });
+
     if (!res.ok) {
       throw new Error(`Failed to create product: ${res.status}`);
     }
-    return res.json(); // -> созданный продукт
+    return res.json();
   }
 
-  static async updateProduct({ id, name, price, categoryId, image }) {
+  static async updateProduct(payload) {
     const formData = new FormData();
-    formData.append("Id", id);
-    formData.append("Name", name);
-    formData.append("Price", String(price));
-    formData.append("CategoryId", categoryId);
-    if (image) {
-      formData.append("Image", image);
+    formData.append("Id", payload.Id);
+    formData.append("Name", payload.Name);
+    formData.append("Price", String(payload.Price));
+    formData.append("CategoryId", payload.CategoryId);
+    if (payload.Image) {
+      formData.append("Image", payload.Image);
     }
-
+    
     const res = await fetch(`${API_BASE}/api/Product`, {
       method: "PUT",
       body: formData,
@@ -71,11 +72,12 @@ export default class ApiService {
     return res.json(); // ожидаем [{ id, name }, ...]
   }
 
-  static async createCategory({ name }) {
+  static async createCategory({ Name }) {
+    console.log({Name})
     const res = await fetch(`${API_BASE}/api/Category`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({ Name }),
     });
     if (!res.ok) {
       throw new Error(`Failed to create category: ${res.status}`);

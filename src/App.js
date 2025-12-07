@@ -26,7 +26,8 @@ function App() {
   createProduct,
   updateProduct,
   deleteProduct,
-  deleteCategory,
+  deleteCategory, 
+  createCategory,
   } = useApi();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -39,13 +40,10 @@ function App() {
 
   //Остальные хуки
   useEffect(() => {
-  fetchProducts();
-  fetchCategories();
-  tg.ready();
+    fetchProducts();
+    fetchCategories();
+    tg.ready();
   }, [tg, fetchProducts, fetchCategories]);
-
-
-
 
   
   //Функции
@@ -92,7 +90,11 @@ function App() {
 
   const totalQty = cartItems.reduce((sum, item) => {return sum + item.qty}, 0)
 
-  const filteredProducts = products.filter(card => card.categoryId === selectedCat)
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  
+  useEffect(() => {
+      setFilteredProducts(products.filter(card => card.categoryId === selectedCat));
+  }, [selectedCat, products]);
 
   
 
@@ -112,12 +114,12 @@ function App() {
 
       <Header 
       selectedCat={selectedCat}
-      onChangeCat={setSelectedCat}
+      setSelectedCat={setSelectedCat}
       categories= {categories}/>
 
       <div className='showcase'>
         {filteredProducts && filteredProducts.map(item => (
-        <ProductCard key={item.id} item={item} onAddToCart={addToCart}/>
+        <ProductCard key={item.Id} item={item} onAddToCart={addToCart}/>
         ))}
       </div>
       
@@ -150,7 +152,8 @@ function App() {
         onCreateProduct={createProduct}
         onUpdateProduct={updateProduct}
         onDeleteProduct={deleteProduct}
-        onDeleteCategory={deleteCategory}/>}
+        onDeleteCategory={deleteCategory}
+        onCreateCategory={createCategory}/>}
 
     </div>
   );

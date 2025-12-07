@@ -4,7 +4,7 @@ import styles from './Header.module.css'
 import "swiper/css";
 
 
-const Header = ({categories, selectedCat, onChangeCat}) => {
+const Header = ({categories, selectedCat, setSelectedCat}) => {
 
   
 
@@ -20,7 +20,7 @@ const Header = ({categories, selectedCat, onChangeCat}) => {
         const index = swiper.realIndex
         const cat = categories[index]
         if (cat) {
-          onChangeCat(cat.id)
+          setSelectedCat(cat.id)
         }
       }}
       >

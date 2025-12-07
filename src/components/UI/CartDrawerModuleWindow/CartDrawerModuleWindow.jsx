@@ -36,7 +36,7 @@ const CartDrawerModuleWindow = ({children, visible, setVisible, items, qtyDecrea
         {items.map(item => 
           (
             <div className={styles.line} key={item.id}>
-              <span className={styles.line_title}>{item.title}</span>
+              <span className={styles.line_title}>{item.name}</span>
 
               <div className={styles.qty_control}>
                   <button 

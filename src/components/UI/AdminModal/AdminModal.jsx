@@ -3,15 +3,16 @@ import React, { useState, useEffect } from "react";
 import styles from './Admin.module.css'
 
 const emptyProduct = {
-  id: null,
-  name: "",
-  price: "",
-  categoryId: "",
-  imageFile: null,
+  Id: null,
+  Name: "",
+  Price: "",
+  CategoryId: "",
+  ImageUrl: null,
 };
 
 const emptyCategory = {
-  name: "",
+  Name: "",
+  CategoryId: "",
 };
 
 const AdminModal = ({
@@ -53,17 +54,18 @@ const AdminModal = ({
     const file = e.target.files?.[0] || null;
     setFormProduct((prev) => ({
       ...prev,
-      imageFile: file,
+      Image: file,
     }));
   };
 
   const handleEditClick = (product) => {
+    console.log(product);
     setFormProduct({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      categoryId: product.categoryId,
-      imageFile: null, // картинку редактируем при необходимости
+      Id: product.id,
+      Name: product.name,
+      Price: product.price,
+      CategoryId: product.categoryId,
+      Image: null, // картинку редактируем при необходимости
     });
     setIsEditMode(true);
   };
@@ -72,20 +74,20 @@ const AdminModal = ({
     e.preventDefault();
 
     const payload = {
-      id: formProduct.id,
-      name: formProduct.name.trim(),
-      price: Number(formProduct.price),
-      categoryId: formProduct.categoryId,
-      image: formProduct.imageFile || undefined,
+      Name: formProduct.Name.trim(),
+      Price: Number(formProduct.Price),
+      CategoryId: formProduct.CategoryId,
+      Image: formProduct.Image || undefined,
     };
-
-    if (!payload.name || !payload.price || !payload.categoryId) return;
-
-    if (isEditMode && payload.id) {
-      await onUpdateProduct(payload);
-    } else {
+    
+    if (!payload.Name || !payload.Price || !payload.CategoryId) return;
+    if(isEditMode) {
+      console.log(formProduct);
+      await onUpdateProduct(formProduct);
+    }else{
       await onCreateProduct(payload);
     }
+    
 
     setFormProduct(emptyProduct);
     setIsEditMode(false);
@@ -93,7 +95,7 @@ const AdminModal = ({
 
   const handleProductDelete = async (id) => {
     await onDeleteProduct(id);
-    if (isEditMode && formProduct.id === id) {
+    if (isEditMode && formProduct.Id === id) {
       setFormProduct(emptyProduct);
       setIsEditMode(false);
     }
@@ -101,10 +103,10 @@ const AdminModal = ({
 
   const handleCategorySubmit = async (e) => {
     e.preventDefault();
-    const name = formCategory.name.trim();
-    if (!name) return;
+    const Name = formCategory.name.trim();
+    if (!Name) return;
 
-    await onCreateCategory({ name });
+    await onCreateCategory({Name});
     setFormCategory(emptyCategory);
   };
 
@@ -175,8 +177,8 @@ const AdminModal = ({
                 Название
                 <input
                   type="text"
-                  name="name"
-                  value={formProduct.name}
+                  name="Name"
+                  value={formProduct.Name}
                   onChange={handleProductChange}
                   placeholder="Например, Netflix 1 мес."
                   required
@@ -187,8 +189,8 @@ const AdminModal = ({
                 Цена
                 <input
                   type="number"
-                  name="price"
-                  value={formProduct.price}
+                  name="Price"
+                  value={formProduct.Price}
                   onChange={handleProductChange}
                   min="0"
                   step="0.01"
@@ -200,8 +202,8 @@ const AdminModal = ({
               <label>
                 Категория
                 <select
-                  name="categoryId"
-                  value={formProduct.categoryId}
+                  name="CategoryId"
+                  value={formProduct.CategoryId}
                   onChange={handleProductChange}
                   required
                 >

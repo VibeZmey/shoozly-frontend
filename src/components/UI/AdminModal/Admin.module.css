@@ -1,4 +1,4 @@
-/* AdminModal.module.css */
+/* AdminModal. module.css */
 
 .overlay {
   position: fixed;
@@ -71,8 +71,8 @@
 
 /* верх: товары + форма */
 .content {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
   margin-bottom: 12px;
 }
@@ -194,10 +194,23 @@
 }
 
 /* форма товара */
+.form {
+  display: flex;
+  flex-direction: column;
+  max-height: 400px; /* ограничиваем высоту */
+}
+
+.form h3 {
+  flex-shrink: 0; /* заголовок не сжимается */
+}
+
 .formBody {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  overflow-y: auto; /* добавляем скролл */
+  padding-right: 4px; /* отступ для красоты скроллбара */
+  scrollbar-width: thin;
 }
 
 .formBody label {
@@ -361,6 +374,10 @@
 
   .productList {
     max-height: 200px;
+  }
+
+  .form {
+    max-height: 200px; /* на мобильных чуть меньше */
   }
 
   .categories {

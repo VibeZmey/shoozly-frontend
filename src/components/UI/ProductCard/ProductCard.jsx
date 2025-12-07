@@ -9,8 +9,9 @@ const ProductCard = ({item, onAddToCart}) => {
         </div>
         <div className={styles.card__content}>
             <span className={styles.card__title}>
-                {item.name} 
+                {item.name}
             </span>
+            
             <span className={styles.card__price}>
                 {item.price}
             </span>
