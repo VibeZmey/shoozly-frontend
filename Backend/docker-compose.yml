@@ -1,0 +1,118 @@
+version: '3.8'
+
+services:
+  
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    expose:
+      - "5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - shop-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    expose:
+      - "9000"
+      - "9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - shop-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./WebApi
+      dockerfile: Dockerfile
+    image: shop_backend
+    container_name: shop_backend
+    expose:
+      - "8080"
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+      MinIO__Endpoint: "minio:9000"
+      MinIO__AccessKey: ${MINIO_ACCESS_KEY}
+      MinIO__SecretKey: ${MINIO_SECRET_KEY}
+      MinIO__BucketName: "images"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - shop-network
+    restart: unless-stopped
+  
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: shop_frontend
+    expose:
+      - "80"
+    depends_on:
+      - backend
+    networks:
+      - shop-network
+    restart: unless-stopped
+
+  nginx-proxy:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    expose:
+      - "80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+      - minio
+    networks:
+      - shop-network
+    restart: unless-stopped
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok
+    command:
+      - "http"
+      - "http://nginx-proxy:80"  # ← Добавили http://
+      - "--authtoken=${NGROK_AUTHTOKEN}"
+    ports:
+      - "4040:4040"
+    networks:
+      - shop-network
+    depends_on:
+      - nginx-proxy
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  minio-data:
+
+networks:
+  shop-network:
+    driver: bridge

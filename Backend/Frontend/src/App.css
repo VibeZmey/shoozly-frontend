@@ -1,0 +1,58 @@
+/* App.css */
+.App {
+  min-height: 100vh;
+  background: var(--bg-main);
+  padding: 16px 12px 20px; /* сверху/сбоку/снизу — отступы от краёв */
+  box-sizing: border-box;
+}
+
+
+.showcase {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 10px; /* вертикальный / горизонтальный зазор */
+  margin-top: 12px;
+}
+
+.bottom-controls {
+  position: fixed;
+  right: 20px;
+  bottom: 84px; /* чуть выше Go to cart (у неё bottom: 20px и высота 44px) */
+  z-index: 130; /* выше, чем cart__btn (120) */
+}
+
+/* маленькая круглая кнопка в стиле Go to cart */
+.admin-toggle-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: #ffffff;
+  color: var(--accent);
+  font-size: 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.16);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.admin-toggle-btn:hover {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.24);
+}
+
+.admin-toggle-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.18);
+}
